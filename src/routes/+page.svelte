@@ -157,7 +157,7 @@
 	});
 </script>
 
-<div class="min-h-screen bg-[#fffe] p-8">
+<div class="min-h-screen bg-[#fffe] p-8 font-montserrat">
 	<div class="max-w-4xl mx-auto">
 		<div class="monitor">
 		<h1 class="text-6xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
@@ -165,7 +165,7 @@
 		<!-- Heart Rate Display -->
 		<div class="text-center mb-12">
 			<div class="mb-4" style="font-size:90px; color: #f00f;">
-				<span style="font-weight: 300;">{Math.round(heartRate)}</span>
+				<span style="font-weight: 100;">{Math.round(heartRate)}</span>
 			</div>
 			<div class="text-2xl text-gray-400">
 				{getIntensityLabel()}
@@ -229,6 +229,7 @@
 		
 	</div>
 </div>
+
 
 <style>
 	.monitor, .display {
