@@ -12,8 +12,14 @@
 	let hrVariationInterval = $state(null);
 	let nextId = $state(1);
 
+	// Recording toggle: when false, heart continues but data is not recorded
+	let isRecording = $state(false);
+
 	// timestamp (ms) of last stored record - used to ensure we only record once per second
 	let lastRecordAt = $state(0);
+
+	// Simple rate cap: never change more than 3 BPM per second (applied once per second)
+	const MAX_HR_CHANGE = 3; // 3 BPM per second
 	
 	// Exercise intensity ranges
 	const intensityRanges = {
@@ -50,6 +56,8 @@
 	
 	// Record heart beat data (throttled to once per second)
 	function recordHeartBeat() {
+		// Do not record if recording is paused
+		if (!isRecording) return;
 		const nowTs = Date.now();
 		// only record if at least 1 second has passed since last record
 		if (nowTs - lastRecordAt < 1000) return;
@@ -94,34 +102,35 @@
 		}, intervalMs / 2); // Toggle twice per beat (pulse in/out)
 	}
 	
-	// Start heart rate variation
+	// Start heart rate variation (simple ±5 BPM window around slider base)
 	function startHeartRateVariation() {
 		if (hrVariationInterval) clearInterval(hrVariationInterval);
-		
 		hrVariationInterval = setInterval(() => {
-			const baseRate = getBaseHeartRate();
-			const variation = (Math.random() - 0.5) * 20; // ±10 BPM variation
-			const direction = Math.random() > 0.5 ? 1 : -1;
-			
-			// Change by 1 BPM up or down
-			heartRate += direction;
-			
-			// Keep within reasonable bounds around base rate
-			const minRate = Math.max(baseRate - 10, 40);
-			const maxRate = Math.min(baseRate + 10, 220);
-			
-			if (heartRate < minRate) heartRate = minRate;
-			if (heartRate > maxRate) heartRate = maxRate;
-			
-			// Restart beat interval with new rate
+			const baseRate = Math.round(getBaseHeartRate());
+			const minRate = Math.max(baseRate - 5, 40);
+			const maxRate = Math.min(baseRate + 5, 220);
+
+			// If current heartRate is outside ±5 window, move 1 BPM toward nearest bound.
+			if (heartRate < minRate) {
+				heartRate = +(Math.min(heartRate + Math.floor(Math.random() * 3) + 1, minRate));
+			} else if (heartRate > maxRate) {
+				heartRate = +(Math.max(heartRate - Math.floor(Math.random() * 3) + 1, maxRate));
+			} else {
+				// Inside the window small HR variation
+				const step = Math.floor(Math.random() * 3) - 1;
+				heartRate = +(Math.max(minRate, Math.min(maxRate, heartRate + step)));
+			}
 			startHeartBeat();
-		}, 1000); // Change every second
+		}, 1000);
 	}
 	
 	// Handle slider change
 	function onIntensityChange() {
 		const baseRate = getBaseHeartRate();
-		heartRate = baseRate + (Math.random() - 0.5) * 10; // Start with some variation
+		const desired = baseRate + (Math.random() - 0.5) * 10;
+		const delta = desired - heartRate;
+		const capped = Math.sign(delta) * Math.min(Math.abs(delta), MAX_HR_CHANGE);
+		heartRate = +(heartRate + capped).toFixed(2);
 		startHeartBeat();
 	}
 	
@@ -148,9 +157,10 @@
 	});
 </script>
 
-<div class="min-h-screen bg-[#000e] p-8">
+<div class="min-h-screen bg-[#fffe] p-8">
 	<div class="max-w-4xl mx-auto">
-	<h1 class="text-4xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
+		<div class="monitor">
+		<h1 class="text-4xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
 		
 		<!-- Heart Rate Display -->
 		<div class="text-center mb-12">
@@ -165,7 +175,7 @@
 		
 		<!-- Exercise Intensity Slider -->
 		<div class="mb-8">
-			<label for="intensity" class="block text-xl font-semibold text-gray-300 mb-4">
+			<label for="intensity" class="block text-3xl font-normal text-gray-300 mb-4">
 				Exercise Intensity
 			</label>
 			<div class="relative">
@@ -186,57 +196,74 @@
 				</div>
 			</div>
 		</div>
-		
-		<!-- Control Buttons -->
-		<div class="flex gap-4 justify-end mb-8">
+
+		<div class="flex gap-4 justify-between mb-8">
+			<button
+				onclick={() => isRecording = !isRecording}
+				class="px-6 py-3 text-white border border-white-600"
+			>
+				{isRecording ? 'Pause' : 'Start'}
+			</button>
 			<button
 				onclick={clearData}
-				class="px-6 py-3 text-white border border-white-600 hover:bg-red-700"
+				class="px-6 py-3 text-white border border-white-600"
 			>
 				Clear Data
 			</button>
+			
 		</div>
 		
 		<!-- Data Display (always visible) -->
-		<div class="display rounded-lg shadow-lg p-6">
-			<h2 class="text-2xl font-bold text-gray-300 mb-4">Heart Beat Data ({heartBeatData.length} records)</h2>
+		<div class="display rounded-lg shadow-lg">
+			<h2 class="text-2xl font-normal text-gray-300 mb-4">({heartBeatData.length} records)</h2>
 			{#if heartBeatData.length === 0}
 				<p class="text-gray-400">No heart beat data recorded yet.</p>
 			{:else}
 					<div class="overflow-y-auto">
-						<pre class="text-sm p-4 whitespace-pre-wrap">
-							{JSON.stringify([...heartBeatData].reverse(), null, 2)}
-						</pre>
+						<pre class="text-sm whitespace-pre-wrap" style="text-align:left;">{JSON.stringify([...heartBeatData].reverse(), null, 2)}</pre>
 					</div>
 			{/if}
 		</div>
 	</div>
+		<!-- Control Buttons -->
+		
+	</div>
 </div>
 
 <style>
-	.display {
-		background: linear-gradient(90deg, #330303, #8f1010,#330303);
+	.monitor, .display {
+		padding: 50px;
 		color: #e0e0e0;
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;	
+		background: linear-gradient(90deg, #000000, #1d1d1d,#000000);
+		box-shadow: inset 10px 10px 20px rgba(121, 119, 119, 0.6), 10px 10px 50px #000f;
+		border-radius: 70px;
 	}	
+	.display{
+		background: linear-gradient(90deg, #640606, #da1818,#330303);
+		box-shadow: inset 10px 10px 20px rgba(39, 39, 39, 0.6), 10px 10px 50px #000f;
+	}	
+	.slider{
+		height: 40px;
+		padding: 0px;
+		border-radius: 20px;
+		background: rgb(46, 45, 45);
+		box-shadow: inset 10px 10px 20px #000000;
+	}
 	.slider::-webkit-slider-thumb {
 		appearance: none;
-		height: 25px;
-		width: 25px;
+		height: 40px;
+		width: 40px;
 		border-radius: 50%;
-		background: #181c24;
+		background: #727375;
+		box-shadow: inset 10px 10px 20px #9e9a9a;
+
 		cursor: pointer;
-		border: 2px solid #ffffff;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
-	
+	}	
 	.slider::-moz-range-thumb {
-		height: 25px;
-		width: 25px;
+		height: 40px;
+		width: 40px;
 		border-radius: 50%;
 		background: #020407;
 		cursor: pointer;
-		border: 2px solid #ffffff;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 	}
 </style>
