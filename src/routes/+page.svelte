@@ -4,12 +4,14 @@
 	// State variables using Svelte 5 runes
 	let heartRate = $state(65);
 	let exerciseIntensity = $state(50); // 0-100 scale
+	
 	// numeric font weight for the heart-rate number (toggle between 100 and 300)
 	let hrWeight = $state(100);
 	let heartBeatData = $state([]);
 	let beatInterval = $state(null);
 	let hrVariationInterval = $state(null);
 	let nextId = $state(1);
+
 	// timestamp (ms) of last stored record - used to ensure we only record once per second
 	let lastRecordAt = $state(0);
 	
@@ -146,15 +148,15 @@
 	});
 </script>
 
-<div class="min-h-screen bg-[#eeef] p-8">
+<div class="min-h-screen bg-[#000e] p-8">
 	<div class="max-w-4xl mx-auto">
-	<h1 class="text-4xl font-bold text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
+	<h1 class="text-4xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
 		
 		<!-- Heart Rate Display -->
 		<div class="text-center mb-12">
-			<div class="text-6xl mb-4" style="font-size:50px; color: #ff3b30;">
-				<span style="font-weight: {hrWeight};">{Math.round(heartRate)}</span>
-				<span style="font-weight: 400; margin-left:8px; color: #ff3b30;">BPM</span>
+			<div class="text-6xl mb-4" style="font-size:50px; color: #f00f;">
+				<span style="font-weight: 100;">{Math.round(heartRate)}</span>
+				<!-- <span style="font-weight: 300; margin-left:8px; color: #f00f;">bpm</span> -->
 			</div>
 			<div class="text-2xl text-gray-400">
 				{getIntensityLabel()}
@@ -163,12 +165,15 @@
 		
 		<!-- Exercise Intensity Slider -->
 		<div class="mb-8">
-			<label class="block text-xl font-semibold text-gray-300 mb-4">Exercise Intensity</label>
+			<label for="intensity" class="block text-xl font-semibold text-gray-300 mb-4">
+				Exercise Intensity
+			</label>
 			<div class="relative">
 				<input
 					type="range"
+					id="intensity"
 					bind:value={exerciseIntensity}
-					on:input={onIntensityChange}
+					oninput={onIntensityChange}
 					min="0"
 					max="100"
 					class="w-full h-3 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
@@ -183,23 +188,23 @@
 		</div>
 		
 		<!-- Control Buttons -->
-		<div class="flex gap-4 justify-center mb-8">
+		<div class="flex gap-4 justify-end mb-8">
 			<button
-				on:click={clearData}
-				class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+				onclick={clearData}
+				class="px-6 py-3 text-white border border-white-600 hover:bg-red-700"
 			>
 				Clear Data
 			</button>
 		</div>
 		
 		<!-- Data Display (always visible) -->
-		<div class="bg-white rounded-lg shadow-lg p-6">
+		<div class="display rounded-lg shadow-lg p-6">
 			<h2 class="text-2xl font-bold text-gray-300 mb-4">Heart Beat Data ({heartBeatData.length} records)</h2>
 			{#if heartBeatData.length === 0}
 				<p class="text-gray-400">No heart beat data recorded yet.</p>
 			{:else}
-					<div class="max-h-96 overflow-y-auto">
-						<pre class="text-sm bg-gray-100 p-4 rounded whitespace-pre-wrap">
+					<div class="overflow-y-auto">
+						<pre class="text-sm p-4 whitespace-pre-wrap">
 							{JSON.stringify([...heartBeatData].reverse(), null, 2)}
 						</pre>
 					</div>
@@ -209,22 +214,27 @@
 </div>
 
 <style>
+	.display {
+		background: linear-gradient(90deg, #330303, #8f1010,#330303);
+		color: #e0e0e0;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;	
+	}	
 	.slider::-webkit-slider-thumb {
 		appearance: none;
-		height: 20px;
-		width: 20px;
+		height: 25px;
+		width: 25px;
 		border-radius: 50%;
-		background: #3b82f6;
+		background: #181c24;
 		cursor: pointer;
 		border: 2px solid #ffffff;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 	}
 	
 	.slider::-moz-range-thumb {
-		height: 20px;
-		width: 20px;
+		height: 25px;
+		width: 25px;
 		border-radius: 50%;
-		background: #3b82f6;
+		background: #020407;
 		cursor: pointer;
 		border: 2px solid #ffffff;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
