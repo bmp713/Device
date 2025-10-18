@@ -199,7 +199,9 @@
 				<p class="text-gray-400">No heart beat data recorded yet.</p>
 			{:else}
 					<div class="max-h-96 overflow-y-auto">
-						<pre class="text-sm bg-gray-100 p-4 rounded whitespace-pre-wrap">{JSON.stringify([...heartBeatData].reverse(), null, 2)}</pre>
+						<pre class="text-sm bg-gray-100 p-4 rounded whitespace-pre-wrap">
+							{JSON.stringify([...heartBeatData].reverse(), null, 2)}
+						</pre>
 					</div>
 			{/if}
 		</div>
