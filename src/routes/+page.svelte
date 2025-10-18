@@ -110,16 +110,18 @@
 			const minRate = Math.max(baseRate - 5, 40);
 			const maxRate = Math.min(baseRate + 5, 220);
 
-			// If current heartRate is outside ±5 window, move 1 BPM toward nearest bound.
-			if (heartRate < minRate) {
-				heartRate = +(Math.min(heartRate + Math.floor(Math.random() * 3) + 1, minRate));
-			} else if (heartRate > maxRate) {
-				heartRate = +(Math.max(heartRate - Math.floor(Math.random() * 3) + 1, maxRate));
+			// If we're farther than 5 BPM from base, move 1 BPM toward base each second.
+			if (heartRate < baseRate - 5) {
+				heartRate = +(Math.min(heartRate + Math.floor(Math.random() * 5) + 1, baseRate - 5)).toFixed(2);
+			} else if (heartRate > baseRate + 5) {
+				heartRate = +(Math.max(heartRate - Math.floor(Math.random() * 5) + 1, baseRate + 5)).toFixed(2);
 			} else {
-				// Inside the window small HR variation
+				// Inside ±5 window: small jitter -1/0/+1 but clamp to [minRate, maxRate]
 				const step = Math.floor(Math.random() * 3) - 1;
-				heartRate = +(Math.max(minRate, Math.min(maxRate, heartRate + step)));
+				heartRate = +(Math.max(minRate, Math.min(maxRate, heartRate + step))).toFixed(2);
 			}
+
+			// Restart beat timing with the new rate
 			startHeartBeat();
 		}, 1000);
 	}
@@ -164,9 +166,8 @@
 		
 		<!-- Heart Rate Display -->
 		<div class="text-center mb-12">
-			<div class="text-6xl mb-4" style="font-size:50px; color: #f00f;">
-				<span style="font-weight: 100;">{Math.round(heartRate)}</span>
-				<!-- <span style="font-weight: 300; margin-left:8px; color: #f00f;">bpm</span> -->
+			<div class="mb-4" style="font-size:90px; color: #f00f;">
+				<span style="font-weight: 300;">{Math.round(heartRate)}</span>
 			</div>
 			<div class="text-2xl text-gray-400">
 				{getIntensityLabel()}
@@ -177,6 +178,7 @@
 		<div class="mb-8">
 			<label for="intensity" class="block text-3xl font-normal text-gray-300 mb-4">
 				Exercise Intensity
+				<h4 class="text-sm text-gray-500 mt-1">Click different intensity levels to see heart rate respond.</h4>
 			</label>
 			<div class="relative">
 				<input
@@ -200,13 +202,13 @@
 		<div class="flex gap-4 justify-between mb-8">
 			<button
 				onclick={() => isRecording = !isRecording}
-				class="px-6 py-3 text-white border border-white-600"
+				class="px-10 py-3 text-white border border-white-100 rounded-3xl"
 			>
 				{isRecording ? 'Pause' : 'Start'}
 			</button>
 			<button
 				onclick={clearData}
-				class="px-6 py-3 text-white border border-white-600"
+				class="px-6 py-3 text-white border border-white-600 rounded-3xl"
 			>
 				Clear Data
 			</button>
