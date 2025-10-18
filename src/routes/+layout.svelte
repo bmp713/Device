@@ -7,7 +7,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Heart Rate Monitor</title>
+	<title>Heart Rate</title>
 </svelte:head>
 
 {@render children?.()}
