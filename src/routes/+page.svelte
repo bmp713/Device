@@ -202,7 +202,7 @@
 				onclick={() => isRecording = !isRecording}
 				class="px-10 py-3 text-white border border-white-100 rounded-3xl"
 			>
-				{isRecording ? 'Pause' : 'Start'}
+				{isRecording ? 'Pause' : 'Record'}
 			</button>
 			<button
 				onclick={clearData}
