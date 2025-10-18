@@ -3,7 +3,7 @@
 	
 	// State variables using Svelte 5 runes
 	let heartRate = $state(65);
-	let exerciseIntensity = $state(50); // 0-100 scale
+	let exerciseIntensity = $state(0); // 0-100 scale (start at lowest)
 	
 	// numeric font weight for the heart-rate number (toggle between 100 and 300)
 	let hrWeight = $state(100);
@@ -12,13 +12,10 @@
 	let hrVariationInterval = $state(null);
 	let nextId = $state(1);
 
-	// Recording toggle: when false, heart continues but data is not recorded
 	let isRecording = $state(false);
-
-	// timestamp (ms) of last stored record - used to ensure we only record once per second
 	let lastRecordAt = $state(0);
 
-	// Simple rate cap: never change more than 3 BPM per second (applied once per second)
+	// Simple rate cap: never change more than 3 BPM per second
 	const MAX_HR_CHANGE = 3; // 3 BPM per second
 	
 	// Exercise intensity ranges
@@ -56,9 +53,11 @@
 	
 	// Record heart beat data (throttled to once per second)
 	function recordHeartBeat() {
+		
 		// Do not record if recording is paused
 		if (!isRecording) return;
 		const nowTs = Date.now();
+
 		// only record if at least 1 second has passed since last record
 		if (nowTs - lastRecordAt < 1000) return;
 		lastRecordAt = nowTs;
@@ -128,12 +127,9 @@
 	
 	// Handle slider change
 	function onIntensityChange() {
-		const baseRate = getBaseHeartRate();
-		const desired = baseRate + (Math.random() - 0.5) * 10;
-		const delta = desired - heartRate;
-		const capped = Math.sign(delta) * Math.min(Math.abs(delta), MAX_HR_CHANGE);
-		heartRate = +(heartRate + capped).toFixed(2);
-		startHeartBeat();
+		// Restart the variation loop so heartRate drifts slowly toward the new slider base.
+		// This ensures identical behavior when clicking or sliding.
+		startHeartRateVariation();
 	}
 	
 	// data is always displayed; no toggle function needed
@@ -142,12 +138,14 @@
 	function clearData() {
 		heartBeatData = [];
 		nextId = 1;
+		exerciseIntensity = 0; // reset slider knob to lowest
 		localStorage.removeItem('heartBeatData');
 	}
 	
 	// Initialize on mount
 	onMount(() => {
 		loadSavedData();
+		exerciseIntensity = 0; // ensure knob starts at lowest
 		onIntensityChange();
 		startHeartRateVariation();
 		
@@ -162,7 +160,7 @@
 <div class="min-h-screen bg-[#fffe] p-8">
 	<div class="max-w-4xl mx-auto">
 		<div class="monitor">
-		<h1 class="text-4xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
+		<h1 class="text-6xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
 		
 		<!-- Heart Rate Display -->
 		<div class="text-center mb-12">
@@ -176,9 +174,9 @@
 		
 		<!-- Exercise Intensity Slider -->
 		<div class="mb-8">
-			<label for="intensity" class="block text-3xl font-normal text-gray-300 mb-4">
+			<label for="intensity" class="block text-4xl font-normal text-gray-300 mb-4">
 				Exercise Intensity
-				<h4 class="text-sm text-gray-500 mt-1">Click different intensity levels to see heart rate respond.</h4>
+				<h2 class="text-sm text-gray-500 mt-1">Click different intensity levels to see heart rate respond.</h2>
 			</label>
 			<div class="relative">
 				<input
@@ -190,7 +188,7 @@
 					max="100"
 					class="w-full h-3 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
 				/>
-				<div class="flex justify-between text-sm text-gray-400 mt-2">
+				<div class="flex justify-between text-md text-gray-400 mt-2">
 					<span class="text-left">Resting<br>(50-80 BPM)</span>
 					<span class="text-center">Walking<br>(80-110 BPM)</span>
 					<span class="text-center">Jogging<br>(110-140 BPM)</span>
@@ -244,8 +242,11 @@
 		background: linear-gradient(90deg, #640606, #da1818,#330303);
 		box-shadow: inset 10px 10px 20px rgba(39, 39, 39, 0.6), 10px 10px 50px #000f;
 	}	
+	button{
+		cursor: pointer;
+	}
 	.slider{
-		height: 40px;
+		height: 50px;
 		padding: 0px;
 		border-radius: 20px;
 		background: rgb(46, 45, 45);
@@ -253,8 +254,8 @@
 	}
 	.slider::-webkit-slider-thumb {
 		appearance: none;
-		height: 40px;
-		width: 40px;
+		height: 50px;
+		width: 50px;
 		border-radius: 50%;
 		background: #727375;
 		box-shadow: inset 10px 10px 20px #9e9a9a;
@@ -262,8 +263,8 @@
 		cursor: pointer;
 	}	
 	.slider::-moz-range-thumb {
-		height: 40px;
-		width: 40px;
+		height: 50px;
+		width: 50px;
 		border-radius: 50%;
 		background: #020407;
 		cursor: pointer;
