@@ -220,9 +220,7 @@
 					</div>
 			{/if}
 		</div>
-	</div>
-		<!-- Control Buttons -->
-		
+	</div>		
 	</div>
 </div>
 
