@@ -1,4 +1,4 @@
-# Heart Rate Device
+# Heart Rate App
 
 - Svelte heart-rate simulator app with timestamped data samples
 - Shows live BPM display, an exercise intensity slider to influence realistic exercise induced heart rate adaptations

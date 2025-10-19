@@ -93,12 +93,11 @@
 		const intervalMs = (60 / bpm) * 1000; // Convert BPM to milliseconds
 		
 		beatInterval = setInterval(() => {
-			// toggle weight between 100 and 300 to create a pulsing effect
 			hrWeight = hrWeight === 100 ? 300 : 100;
 			if (hrWeight === 300) {
 				recordHeartBeat();
 			}
-		}, intervalMs / 2); // Toggle twice per beat (pulse in/out)
+		}, intervalMs / 2); 
 	}
 	
 	// Start heart rate variation (simple ±5 BPM window around slider base)
@@ -115,7 +114,7 @@
 			} else if (heartRate > baseRate + 5) {
 				heartRate = +(Math.max(heartRate - Math.floor(Math.random() * 5) + 1, baseRate + 5)).toFixed(2);
 			} else {
-				// Inside ±5 window: small jitter -1/0/+1 but clamp to [minRate, maxRate]
+				// Inside ±5 window: small jitter
 				const step = Math.floor(Math.random() * 3) - 1;
 				heartRate = +(Math.max(minRate, Math.min(maxRate, heartRate + step))).toFixed(2);
 			}
@@ -128,12 +127,9 @@
 	// Handle slider change
 	function onIntensityChange() {
 		// Restart the variation loop so heartRate drifts slowly toward the new slider base.
-		// This ensures identical behavior when clicking or sliding.
 		startHeartRateVariation();
 	}
-	
-	// data is always displayed; no toggle function needed
-	
+		
 	// Clear all data
 	function clearData() {
 		heartBeatData = [];
