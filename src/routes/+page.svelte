@@ -102,7 +102,9 @@
 	
 	// Start heart rate variation (simple ±5 BPM window around slider base)
 	function startHeartRateVariation() {
+
 		if (hrVariationInterval) clearInterval(hrVariationInterval);
+		
 		hrVariationInterval = setInterval(() => {
 			const baseRate = Math.round(getBaseHeartRate());
 			const minRate = Math.max(baseRate - 5, 40);
@@ -114,7 +116,7 @@
 			} else if (heartRate > baseRate + 5) {
 				heartRate = +(Math.max(heartRate - Math.floor(Math.random() * 5) + 1, baseRate + 5)).toFixed(2);
 			} else {
-				// Inside ±5 window: small jitter
+				// Inside ±5 window small jitter
 				const step = Math.floor(Math.random() * 3) - 1;
 				heartRate = +(Math.max(minRate, Math.min(maxRate, heartRate + step))).toFixed(2);
 			}
@@ -126,7 +128,6 @@
 	
 	// Handle slider change
 	function onIntensityChange() {
-		// Restart the variation loop so heartRate drifts slowly toward the new slider base.
 		startHeartRateVariation();
 	}
 		
@@ -134,14 +135,14 @@
 	function clearData() {
 		heartBeatData = [];
 		nextId = 1;
-		exerciseIntensity = 0; // reset slider knob to lowest
+		exerciseIntensity = 0; 
 		localStorage.removeItem('heartBeatData');
 	}
 	
 	// Initialize on mount
 	onMount(() => {
 		loadSavedData();
-		exerciseIntensity = 0; // ensure knob starts at lowest
+		exerciseIntensity = 0; 
 		onIntensityChange();
 		startHeartRateVariation();
 		
