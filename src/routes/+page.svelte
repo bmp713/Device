@@ -253,9 +253,9 @@
 		height: 50px;
 		width: 50px;
 		border-radius: 50%;
-		background: #727375;
-		box-shadow: inset 10px 10px 20px #9e9a9a;
-
+		background: #2f2f30;
+		box-shadow: inset 10px 10px 20px #9e9a9a, inset 10px 10px 20px #161616, 5px 5px 5px rgb(30, 30, 31);
+		border: 5px solid #3a3838;
 		cursor: pointer;
 	}	
 	.slider::-moz-range-thumb {
