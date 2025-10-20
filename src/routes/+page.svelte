@@ -229,7 +229,7 @@
 	.monitor, .display {
 		padding: 50px;
 		color: #e0e0e0;
-		background: linear-gradient(90deg, #000000, #1d1d1d,#000000);
+		background: linear-gradient(90deg, #000000, #252525,#000000);
 		box-shadow: inset 10px 10px 20px rgba(121, 119, 119, 0.6), 10px 10px 50px #000f;
 		border-radius: 100px;
 	}	
