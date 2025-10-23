@@ -4,6 +4,10 @@
 	// State variables using Svelte 5 runes
 	let heartRate = $state(65);
 	let exerciseIntensity = $state(0); // 0-100 scale (start at lowest)
+	// Glucose tracking (mg/dL)
+	let glucose = $state(85);
+	let glucoseHistory = $state([]); // timestamps of recent high-HR events
+	let prevHeartRate = $state(65);
 	
 	// numeric font weight for the heart-rate number (toggle between 100 and 300)
 	let hrWeight = $state(100);
@@ -66,7 +70,8 @@
 			id: nextId++,
 			date: now.toLocaleDateString(),
 			time: now.toLocaleTimeString(),
-			heartRate: Math.round(heartRate)
+			heartRate: Math.round(heartRate),
+			glucose: Math.round(glucose)
 		};
 		heartBeatData.push(data);
 
@@ -106,6 +111,12 @@
 		if (hrVariationInterval) clearInterval(hrVariationInterval);
 		
 		hrVariationInterval = setInterval(() => {
+			// Update glucose first based on recent heart rate history before HR variation
+			updateGlucose();
+
+			const cutoff = Date.now() - 2 * 60 * 1000;
+			glucoseHistory = glucoseHistory.filter(ts => ts >= cutoff);
+
 			const baseRate = Math.round(getBaseHeartRate());
 			const minRate = Math.max(baseRate - 5, 40);
 			const maxRate = Math.min(baseRate + 5, 220);
@@ -124,6 +135,41 @@
 			// Restart beat timing with the new rate
 			startHeartBeat();
 		}, 1000);
+	}
+
+	function updateGlucose() {
+		const hr = heartRate;
+
+		// Linear component: modest proportional increase with HR so linearTarget alone
+		// won't hit 150 before max HR.
+		const linearSlope = 0.3; // mg/dL per BPM (reduced)
+		const linearTarget = 90 + Math.max(0, hr - 60) * linearSlope;
+
+		// Exponential bump when HR > 130. Normalize the exponential so that the
+		// bump reaches bumpMax at HR=200 — this guarantees target ~= 150 only at max HR.
+		let bump = 0;
+		if (hr > 130) {
+			const scale = 12; // controls steepness
+			const numerator = Math.exp((hr - 130) / scale) - 1;
+			const denom = Math.exp((200 - 130) / scale) - 1 || 1;
+			const linearAt200 = 90 + (200 - 60) * linearSlope; // baseline contribution at HR=200
+			const bumpMax = Math.max(0, 150 - linearAt200); // amount needed to reach 150 at HR=200
+			bump = bumpMax * (numerator / denom);
+		}
+
+		let target = linearTarget + bump;
+		// safety clamp
+		target = Math.min(150, target);
+
+		// Always jitter +/-3 around the target
+		const jitter = (Math.random() * 6) - 3; // -3 .. +3
+		let next = target + jitter;
+
+		// Hard bounds (keep same min/max as before)
+		next = Math.max(90, Math.min(150, next));
+
+		glucose = +next.toFixed(1);
+		prevHeartRate = hr;
 	}
 	
 	// Handle slider change
@@ -157,23 +203,30 @@
 <div class="min-h-screen bg-[#fffe] p-8 font-montserrat">
 	<div class="max-w-4xl mx-auto">
 		<div class="monitor">
-		<h1 class="text-6xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
+			<h1 class="text-6xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
 		
-		<!-- Heart Rate Display -->
-		<div class="text-center mb-12">
-			<div class="mb-4" style="font-size:90px; color: #f00f;">
-				<span style="font-weight: 100;">{Math.round(heartRate)}</span>
+			<!-- Heart Rate + Glucose Display -->
+			<div class="text-center mb-12">
+				<div class="mb-4 flex items-center justify-center gap-8">
+					<div class="text-[90px] text-[#ff0000] leading-[1] w-[130px] text-right">
+						<span class="font-thin">{Math.round(heartRate)}</span>
+					</div>
+					<div class="text-left text-[rgba(255,255,255,0.47)] font-['Arial'] font-thin min-w-[130px]">
+						<div class="text-[28px]">
+							{Math.round(glucose)} mg/dL
+						</div>
+					</div>
 			</div>
 			<div class="text-2xl text-gray-400">
 				{getIntensityLabel()}
 			</div>
 		</div>
-		
+
 		<!-- Exercise Intensity Slider -->
 		<div class="mb-8">
 			<label for="intensity" class="block text-4xl font-normal text-gray-300 mb-4">
 				Exercise Intensity
-				<h2 class="text-sm text-gray-500 mt-1">Click different intensity levels to see heart rate respond.</h2>
+				<h2 class="text-sm text-gray-500 mt-1">Click different intensity levels to see HR and glucose respond physiologically.</h2>
 			</label>
 			<div class="relative">
 				<input
@@ -217,7 +270,7 @@
 				<p class="text-gray-400">No heart beat data recorded yet.</p>
 			{:else}
 					<div class="overflow-y-auto">
-						<pre class="text-sm whitespace-pre-wrap" style="text-align:left;">{JSON.stringify([...heartBeatData].reverse(), null, 2)}</pre>
+						<pre class="text-sm whitespace-pre-wrap text-left">{JSON.stringify([...heartBeatData].reverse(), null, 2)}</pre>
 					</div>
 			{/if}
 		</div>
