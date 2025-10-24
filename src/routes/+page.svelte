@@ -211,8 +211,8 @@
 					<div class="text-[90px] text-[#ff0000] leading-[1] w-[130px] text-right">
 						<span class="font-thin">{Math.round(heartRate)}</span>
 					</div>
-					<div class="text-left text-[#fff9] font-['Arial'] font-thin w-[130px]">
-						<div class="text-[30px]">
+					<div class="text-left text-[#fff9] font-['Arial'] font-thin min-w-[130px]">
+						<div class="text-[28px]">
 							{Math.round(glucose)} mg/dL
 						</div>
 					</div>
