@@ -200,81 +200,81 @@
 	});
 </script>
 
-<div class="min-h-screen bg-[#fffe] p-8 font-montserrat">
+<div class="min-h-screen bg-[#fffe] p-8">
 	<div class="max-w-4xl mx-auto">
 		<div class="monitor">
 			<h1 class="text-6xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
 		
 			<!-- Heart Rate + Glucose Display -->
 			<div class="text-center mb-12">
-				<div class="mb-4 flex items-center justify-center gap-8">
+				<div class="flex items-center justify-center gap-8 mb-4">
 					<div class="text-[90px] text-[#ff0000] leading-[1] w-[130px] text-right">
 						<span class="font-thin">{Math.round(heartRate)}</span>
 					</div>
-					<div class="text-left text-[rgba(255,255,255,0.47)] font-['Arial'] font-thin min-w-[130px]">
-						<div class="text-[28px]">
+					<div class="text-left text-[#fff9] font-['Arial'] font-thin w-[130px]">
+						<div class="text-[30px]">
 							{Math.round(glucose)} mg/dL
 						</div>
 					</div>
-			</div>
-			<div class="text-2xl text-gray-400">
-				{getIntensityLabel()}
-			</div>
-		</div>
-
-		<!-- Exercise Intensity Slider -->
-		<div class="mb-8">
-			<label for="intensity" class="block text-4xl font-normal text-gray-300 mb-4">
-				Exercise Intensity
-				<h2 class="text-sm text-gray-500 mt-1">Click different intensity levels to see HR and glucose respond physiologically.</h2>
-			</label>
-			<div class="relative">
-				<input
-					type="range"
-					id="intensity"
-					bind:value={exerciseIntensity}
-					oninput={onIntensityChange}
-					min="0"
-					max="100"
-					class="w-full h-3 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
-				/>
-				<div class="flex justify-between text-md text-gray-400 mt-2">
-					<span class="text-left">Resting<br>(50-80 BPM)</span>
-					<span class="text-center">Walking<br>(80-110 BPM)</span>
-					<span class="text-center">Jogging<br>(110-140 BPM)</span>
-					<span class="text-right">Sprinting<br>(140-200 BPM)</span>
+				</div>
+				<div class="text-2xl text-gray-400">
+					{getIntensityLabel()}
 				</div>
 			</div>
-		</div>
 
-		<div class="flex gap-4 justify-between mb-8">
-			<button
-				onclick={() => isRecording = !isRecording}
-				class="px-10 py-3 text-white border border-white-100 rounded-3xl"
-			>
-				{isRecording ? 'Pause' : 'Record'}
-			</button>
-			<button
-				onclick={clearData}
-				class="px-6 py-3 text-white border border-white-600 rounded-3xl"
-			>
-				Clear Data
-			</button>
-			
-		</div>
-		
-		<!-- Data Display (always visible) -->
-		<div class="display rounded-lg shadow-lg">
-			<h2 class="text-2xl font-normal text-gray-300 mb-4">({heartBeatData.length} records)</h2>
-			{#if heartBeatData.length === 0}
-				<p class="text-gray-400">No heart beat data recorded yet.</p>
-			{:else}
-					<div class="overflow-y-auto">
-						<pre class="text-sm whitespace-pre-wrap text-left">{JSON.stringify([...heartBeatData].reverse(), null, 2)}</pre>
+			<!-- Exercise Intensity Slider -->
+			<div class="mb-8">
+				<label for="intensity" class="flex flex-col text-4xl mb-5">
+					<h1 class="text-4xl mb-1">Exercise Intensity</h1>
+					<h2 class="text-sm text-gray-500">Click different intensity levels to see HR and glucose respond physiologically.</h2>
+				</label>
+				<div>
+					<input
+						class="w-full h-3 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
+						type="range"
+						id="intensity"
+						bind:value={exerciseIntensity}
+						oninput={onIntensityChange}
+						min="0"
+						max="100"
+					/>
+					<div class="flex justify-between text-md text-gray-400 mt-2">
+						<span class="text-left">Resting<br>(50-80 BPM)</span>
+						<span class="text-center">Walking<br>(80-110 BPM)</span>
+						<span class="text-center">Jogging<br>(110-140 BPM)</span>
+						<span class="text-right">Sprinting<br>(140-200 BPM)</span>
 					</div>
-			{/if}
-		</div>
-	</div>		
+				</div>
+			</div>
+
+			<div class="flex justify-between gap-4 mb-8">
+				<button
+					onclick={() => isRecording = !isRecording}
+					class="px-10 py-3 text-white border border-white-100 rounded-3xl"
+				>
+					{isRecording ? 'Pause' : 'Record'}
+				</button>
+				<button
+					onclick={clearData}
+					class="px-6 py-3 text-white border border-white-600 rounded-3xl"
+				>
+					Clear Data
+				</button>
+				
+			</div>
+			
+			<!-- Data Display (always visible) -->
+			<div class="display rounded-lg shadow-lg">
+				<h2 class="text-2xl font-normal text-gray-300 mb-4">({heartBeatData.length} records)</h2>
+				{#if heartBeatData.length === 0}
+					<p class="text-gray-400">No heart beat data recorded yet.</p>
+				{:else}
+						<div class="overflow-y-auto">
+							<pre class="text-sm whitespace-pre-wrap text-left">{JSON.stringify([...heartBeatData].reverse(), null, 2)}</pre>
+						</div>
+				{/if}
+			</div>
+		</div>		
 	</div>
 </div>
 

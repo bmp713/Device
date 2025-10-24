@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@300;400;500;600;700&family=Work+Sans:wght@100;900&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Lato:wght@300;400;700&family=Oswald:wght@300;400;500;600&display=swap');
 
 html, body { 
     /* font-family: 'Work Sans', 'Oswald', 'Anton', 'Impact', 'Poppins', 'Roboto', 'Lato', 'Geist', Arial, 'Helvetica Neue', Arial, sans-serif; */
@@ -10,4 +9,4 @@ html, body {
     font-family: 'Anton', 'Impact', 'Poppins', 'Roboto', 'Lato', 'Geist', 'Helvetica Neue', Arial, sans-serif;
     font-weight: 100;
 }
-
+ 
