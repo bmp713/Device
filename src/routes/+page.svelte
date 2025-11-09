@@ -207,16 +207,6 @@
 		
 			<!-- Heart Rate + Glucose Display -->
 			<div class="text-center mb-12">
-				<div class="flex items-center justify-center gap-8 mb-4">
-					<div class="text-[90px] text-[#ff0000] leading-[1] w-[130px] text-right">
-						<span class="font-thin">{Math.round(heartRate)}</span>
-					</div>
-					<div class="text-left text-[#fff9] font-['Arial'] font-thin min-w-[130px]">
-						<div class="text-[28px]">
-							{Math.round(glucose)} mg/dL
-						</div>
-					</div>
-				</div>
 				<div class="text-2xl text-gray-400">
 					{getIntensityLabel()}
 				</div>
@@ -238,12 +228,6 @@
 						min="0"
 						max="100"
 					/>
-					<div class="flex justify-between text-md text-gray-400 mt-2">
-						<span class="text-left">Resting<br>(50-80 BPM)</span>
-						<span class="text-center">Walking<br>(80-110 BPM)</span>
-						<span class="text-center">Jogging<br>(110-140 BPM)</span>
-						<span class="text-right">Sprinting<br>(140-200 BPM)</span>
-					</div>
 				</div>
 			</div>
 
@@ -263,17 +247,6 @@
 				
 			</div>
 			
-			<!-- Data Display (always visible) -->
-			<div class="display rounded-lg shadow-lg">
-				<h2 class="text-2xl font-normal text-gray-300 mb-4">({heartBeatData.length} records)</h2>
-				{#if heartBeatData.length === 0}
-					<p class="text-gray-400">No heart beat data recorded yet.</p>
-				{:else}
-						<div class="overflow-y-auto">
-							<pre class="text-sm whitespace-pre-wrap text-left">{JSON.stringify([...heartBeatData].reverse(), null, 2)}</pre>
-						</div>
-				{/if}
-			</div>
 		</div>		
 	</div>
 </div>
