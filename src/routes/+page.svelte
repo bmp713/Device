@@ -200,7 +200,7 @@
 	});
 </script>
 
-<div class="min-h-screen bg-[#fffe] p-8">
+<div class="hidden min-h-screen bg-[#fffe] p-8">
 	<div class="max-w-4xl mx-auto">
 		<div class="monitor">
 			<h1 class="text-6xl text-gray-300 text-center mb-8">Heart Rate Monitor</h1>
