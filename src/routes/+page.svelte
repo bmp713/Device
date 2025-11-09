@@ -1,24 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
 	
-	// State variables using Svelte 5 runes
-	let heartRate = $state(65);
-	let exerciseIntensity = $state(0); // 0-100 scale (start at lowest)
-	// Glucose tracking (mg/dL)
-	let glucose = $state(85);
-	let glucoseHistory = $state([]); // timestamps of recent high-HR events
-	let prevHeartRate = $state(65);
-	
-	// numeric font weight for the heart-rate number (toggle between 100 and 300)
-	let hrWeight = $state(100);
-	let heartBeatData = $state([]);
-	let beatInterval = $state(null);
-	let hrVariationInterval = $state(null);
-	let nextId = $state(1);
-
-	let isRecording = $state(false);
-	let lastRecordAt = $state(0);
-
 	// Simple rate cap: never change more than 3 BPM per second
 	const MAX_HR_CHANGE = 3; // 3 BPM per second
 	
