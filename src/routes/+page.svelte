@@ -19,7 +19,7 @@
 	let isRecording = $state(false);
 	let lastRecordAt = $state(0);
 
-	// Simple rate cap: never change more than 3 BPM per second
+	// Simple rate cap: never change more than 3 BPM 
 	const MAX_HR_CHANGE = 3; // 3 BPM per second
 	
 	// Exercise intensity ranges
